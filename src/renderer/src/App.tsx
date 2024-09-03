@@ -9,15 +9,25 @@ export default function App() {
   const [updateFiles, setUpdateFiles] = useState<boolean>(false);
   const [isMoving, setIsMoving] = useState<{ [key: string]: boolean }>({});
 
-  const sourceFolderMyFiles = '//Users//leonardoamaral//Documents//devosteste//C//fontes';
-  const sourceFolder_aFazer = '//Users//leonardoamaral//Documents//devosteste//U//fontes//afazer';
+  // const sourceFolderMyFiles = '//Users//leonardoamaral//Documents//devosteste//C//fontes';
+  // const sourceFolderAFazer  = '//Users//leonardoamaral//Documents//devosteste//U//fontes//afazer';
+  
+  
+  // const folderUpdateMy = '//Users//leonardoamaral//Documents//devosteste//C//fontes//atualizar';
+  // const folderUpdateHe = '//Users//leonardoamaral//Documents//devosteste//U//fontes//atualizar';
+
+  const sourceFolderMyFiles = 'C:\\Fontes';
+  const sourceFolderAFazer  = 'U:\\Fontes\\a fazer';
+  
+  const folderUpdateMy = 'C:\\Fontes\\atualizar';
+  const folderUpdateHe = 'U:\\Fontes\\atualizar';
 
   const getMyFiles = async () => {
     const myFiles = await window.api.getZipFiles(sourceFolderMyFiles);
-    const afazerFiles = await window.api.getZipFiles(sourceFolder_aFazer);
+    const afazerFiles = await window.api.getZipFiles(sourceFolderAFazer);
 
 
-    const filesUpdate = await window.api.getZipFiles('//Users//leonardoamaral//Documents//devosteste//C//fontes//atualizar');
+    const filesUpdate = await window.api.getZipFiles(folderUpdateMy);
 
     setUpdateFiles(false)
     if (filesUpdate && filesUpdate.length > 0) {
@@ -96,8 +106,8 @@ export default function App() {
           <div className="flex items-center space-x-2">
             <button
               onClick={() => moverAtualiza(
-                '//Users//leonardoamaral//Documents//devosteste//C//fontes//atualizar',
-                '//Users//leonardoamaral//Documents//devosteste//U//fontes//atualizar'
+                folderUpdateMy,
+                folderUpdateHe
               )}
               className="underline-effect text-rotion-100 focus:outline-none"
             >
@@ -117,7 +127,7 @@ export default function App() {
             <h2 className="text-xl font-semibold">Meus Fonts:</h2>
             <a
               onClick={() => {
-                window.api.openFolder('//Users//leonardoamaral//Documents//devosteste//C//fontes')
+                window.api.openFolder(sourceFolderMyFiles)
               }}
               href='#'
               className="text-rotion-400">C:\Fontes\</a>
@@ -128,7 +138,7 @@ export default function App() {
                 key={index}
                 title={archive.name}
                 date={archive.modifiedAt}
-                onClick={() => handleFileMove(archive.name, sourceFolderMyFiles, sourceFolder_aFazer)} // Move da pasta 2 para a pasta 1˝
+                onClick={() => handleFileMove(archive.name, sourceFolderMyFiles, sourceFolderAFazer)}
                 isMoving={isMoving[archive.name] || false}
               />
             )}
@@ -141,7 +151,7 @@ export default function App() {
             <h2 className="text-xl font-semibold">A fazer:</h2>
             <a
               onClick={() => {
-                window.api.openFolder('//Users//leonardoamaral//Documents//devosteste//U//fontes//afazer')
+                window.api.openFolder(sourceFolderAFazer)
               }}
               href='#'
               className="text-rotion-400"
@@ -154,7 +164,7 @@ export default function App() {
                 key={index}
                 title={archive.name}
                 date={archive.modifiedAt}
-                onClick={() => handleFileMove(archive.name, sourceFolder_aFazer, sourceFolderMyFiles)} // Move da pasta 2 para a pasta 1
+                onClick={() => handleFileMove(archive.name, sourceFolderAFazer, sourceFolderMyFiles)}
                 isMoving={isMoving[archive.name] || false}
               />
             )}
