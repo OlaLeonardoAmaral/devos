@@ -7,8 +7,6 @@
     box-shadow: 0 0 2px 1px rgba(34, 197, 94, 0.2); /* Brilho mais sutil */
 }
 
-
-
 .underline-effect {
     position: relative;
     display: inline-block;
@@ -30,3 +28,22 @@
     width: 100%;
     left: 0;
 }
+
+/* Adicione essa parte ao seu CSS global ou em um arquivo de estilo apropriado */
+
+/* Definindo a animação */
+/* global.css */
+@keyframes moveCard {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-moveCard {
+    animation: moveCard 0.3s ease-in-out;
+  }

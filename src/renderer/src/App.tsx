@@ -1,45 +1,104 @@
+import { useState } from 'react';
 import { ArchiveCard } from './components/archive-card';
 import './styles/global.css';
+import { useQuery } from '@tanstack/react-query';
+
 
 export default function App() {
   // const isMacOS = process.platform === 'darwin'
+  const [updateFiles, setUpdateFiles] = useState<boolean>(false);
+  const [isMoving, setIsMoving] = useState<{ [key: string]: boolean }>({});
 
-  const afazeres = [
-    {
-      title: 'psantaisabel.zip',
-      date: '22/04/2024 - 13h45',
-    },
-    {
-      title: 'n2sroque_d7.zip',
-      date: '22/04/2024 - 13h45',
-    },
-    {
-      title: 'lsuzano.zip',
-      date: '22/04/2024 - 13h45',
-    },
-  ]
+  const sourceFolderMyFiles = '//Users//leonardoamaral//Documents//devosteste//C//fontes';
+  const sourceFolder_aFazer = '//Users//leonardoamaral//Documents//devosteste//U//fontes//afazer';
 
-  const myfonts = [
-    {
-      title: 'r1sandre_d7.zip',
-      date: '23/04/2024 - 13h45',
-    },
-  ]
+  const getMyFiles = async () => {
+    const myFiles = await window.api.getZipFiles(sourceFolderMyFiles);
+    const afazerFiles = await window.api.getZipFiles(sourceFolder_aFazer);
 
-  const atualizar = true;
+
+    const filesUpdate = await window.api.getZipFiles('//Users//leonardoamaral//Documents//devosteste//C//fontes//atualizar');
+
+    setUpdateFiles(false)
+    if (filesUpdate && filesUpdate.length > 0) {
+      setUpdateFiles(true)
+    }
+
+    //console.log(files);
+    return { myFiles, afazerFiles };
+  }
+
+  const { data, refetch } = useQuery(
+    {
+      queryKey: ['files'],
+      queryFn: getMyFiles,
+    }
+  )
+
+  const atualizar = updateFiles;
+
+  const moverAtualiza = async (sourceFolderPath: string, destinationFolderPath: string) => {
+    try {
+      const result = await window.api.moveFiles(
+        sourceFolderPath,
+        destinationFolderPath
+      );
+
+      if (result.success) {
+        console.log('Arquivos movidos com sucesso!');
+        setUpdateFiles(false)
+        // Atualize a lista de arquivos após mover
+        // Você pode chamar getMyFiles novamente aqui
+      } else {
+        console.error('Erro ao mover arquivos:', result.error);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar arquivos:', error);
+    }
+  };
+
+  // Função para mover o arquivo ao clicar
+  const handleFileMove = async (fileName: string, currentFolder: string, targetFolder: string) => {
+    setIsMoving(prevState => ({ ...prevState, [fileName]: true })); // Ativa a animação para o card específico
+    try {
+      const result = await window.api.moveUniqueFiles(
+        currentFolder,
+        targetFolder,
+        fileName
+      );
+
+      if (result.success) {
+        console.log('Arquivo movido com sucesso!');
+        refetch(); // Atualiza a lista de arquivos após mover
+      } else {
+        console.error('Erro ao mover arquivo:', result.error);
+      }
+    } catch (error) {
+      console.error('Erro ao mover arquivo:', error);
+    } finally {
+      setTimeout(() => {
+        setIsMoving(prevState => ({ ...prevState, [fileName]: false })); // Reseta a animação após a transição
+      }, 300);
+    }
+  };
 
   return (
     <div className="h-screen w-screen bg-rotion-900 text-rotion-100">
       <nav className="flex items-center justify-between p-4 px-8 bg-transparent border-b border-rotion-700">
 
         <div className="flex items-center space-x-2">
-          <span className="text-2xl font-bold flex items-center gap-3 before:w-1 before:h-4 before:bg-blue-500 before:flex">Dev.OS</span>
+          <span className="text-2xl font-bold flex items-center gap-3 before:w-1 before:h-4 before:bg-blue-500 before:flex">
+            Dev.OS
+          </span>
         </div>
 
         {atualizar && (
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => console.log('oiii')}
+              onClick={() => moverAtualiza(
+                '//Users//leonardoamaral//Documents//devosteste//C//fontes//atualizar',
+                '//Users//leonardoamaral//Documents//devosteste//U//fontes//atualizar'
+              )}
               className="underline-effect text-rotion-100 focus:outline-none"
             >
               Atualizar
@@ -57,14 +116,22 @@ export default function App() {
           <header className="flex gap-4 items-center text-rotion-100 mb-4">
             <h2 className="text-xl font-semibold">Meus Fonts:</h2>
             <a
-            onClick={() => {
-              window.api.openFolder('//Users//leonardoamaral//Documents//projetos')
-            }}
+              onClick={() => {
+                window.api.openFolder('//Users//leonardoamaral//Documents//devosteste//C//fontes')
+              }}
               href='#'
-              className="text-rotion-400">C:\Fontes\</a>{/*  // quero que seu estilo continue o mesmo mas quero que ele seja um "link", esse span diz o caminho de uma pasta que o usuario tem na maquina dele, quando ele clicar ele deve ser direcionado para a pasta  */}
+              className="text-rotion-400">C:\Fontes\</a>
           </header>
           <div className="flex flex-wrap gap-4">
-            {myfonts.map((archive, index) => <ArchiveCard key={index} title={archive.title} date={archive.date} />)}
+            {data?.myFiles?.map((archive, index) =>
+              <ArchiveCard
+                key={index}
+                title={archive.name}
+                date={archive.modifiedAt}
+                onClick={() => handleFileMove(archive.name, sourceFolderMyFiles, sourceFolder_aFazer)} // Move da pasta 2 para a pasta 1˝
+                isMoving={isMoving[archive.name] || false}
+              />
+            )}
           </div>
         </section>
 
@@ -72,15 +139,29 @@ export default function App() {
         <section>
           <header className="flex gap-4 items-center text-rotion-100 mb-4">
             <h2 className="text-xl font-semibold">A fazer:</h2>
-            <a href='#' className="text-rotion-400">U:\Fontes\A Fazer\</a>
+            <a
+              onClick={() => {
+                window.api.openFolder('//Users//leonardoamaral//Documents//devosteste//U//fontes//afazer')
+              }}
+              href='#'
+              className="text-rotion-400"
+            >U:\Fontes\A Fazer\</a>
           </header>
           <div className="flex flex-wrap gap-4">
             {/* Example Cards */}
-            {afazeres.map((archive, index) => <ArchiveCard key={index} title={archive.title} date={archive.date} />)}
+            {data?.afazerFiles.map((archive, index) =>
+              <ArchiveCard
+                key={index}
+                title={archive.name}
+                date={archive.modifiedAt}
+                onClick={() => handleFileMove(archive.name, sourceFolder_aFazer, sourceFolderMyFiles)} // Move da pasta 2 para a pasta 1
+                isMoving={isMoving[archive.name] || false}
+              />
+            )}
           </div>
         </section>
       </div>
-
     </div>
+
   )
 }
