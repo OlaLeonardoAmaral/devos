@@ -1,6 +1,6 @@
 {
   "name": "devos",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Plataforma que automatiza a organização de arquivos, tornando o processo de movimentação mais visual e agradável.",
   "main": "./out/main/index.js",
   "author": "amaral.com",

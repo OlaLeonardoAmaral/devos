@@ -10,17 +10,18 @@ export default function App() {
   const [isMoving, setIsMoving] = useState<{ [key: string]: boolean }>({});
 
   // const sourceFolderMyFiles = '//Users//leonardoamaral//Documents//devosteste//C//fontes';
-  // const sourceFolderAFazer  = '//Users//leonardoamaral//Documents//devosteste//U//fontes//afazer';
+  // const sourceFolderAFazer  = '//Users//leonardoamaral//Documents//devosteste//U//fontes//a fazer';
   
   
   // const folderUpdateMy = '//Users//leonardoamaral//Documents//devosteste//C//fontes//atualizar';
   // const folderUpdateHe = '//Users//leonardoamaral//Documents//devosteste//U//fontes//atualizar';
 
   const sourceFolderMyFiles = 'C:\\Fontes';
-  const sourceFolderAFazer  = 'U:\\Fontes\\a fazer';
+  const sourceFolderAFazer  = '\\\\192.168.200.10\\amaral\\Fontes\\a fazer';
+
   
   const folderUpdateMy = 'C:\\Fontes\\atualizar';
-  const folderUpdateHe = 'U:\\Fontes\\atualizar';
+  const folderUpdateHe = '\\\\192.168.200.10\\amaral\\Fontes\\atualizar';
 
   const getMyFiles = async () => {
     const myFiles = await window.api.getZipFiles(sourceFolderMyFiles);
