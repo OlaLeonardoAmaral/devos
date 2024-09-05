@@ -17,11 +17,11 @@ export default function App() {
   // const folderUpdateHe = '//Users//leonardoamaral//Documents//devosteste//U//fontes//atualizar';
 
   const sourceFolderMyFiles = 'C:\\Fontes';
-  const sourceFolderAFazer  = '\\\\192.168.200.10\\amaral\\Fontes\\a fazer';
+  const sourceFolderAFazer  = 'U:\\Fontes\\a fazer';
 
   
   const folderUpdateMy = 'C:\\Fontes\\atualizar';
-  const folderUpdateHe = '\\\\192.168.200.10\\amaral\\Fontes\\atualizar';
+  const folderUpdateHe = 'U:\\Fontes\\atualizar';
 
   const getMyFiles = async () => {
     const myFiles = await window.api.getZipFiles(sourceFolderMyFiles);

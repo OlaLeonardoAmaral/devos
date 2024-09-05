@@ -3,6 +3,27 @@ import { exec } from 'child_process';
 import { join } from 'path';
 import { readdir, rename, stat } from 'fs/promises';
 import dayjs from 'dayjs';
+import * as fs from 'fs';
+import * as os from 'os';
+
+
+interface ZipFile {
+    name: string;
+    size: number; // Tamanho em bytes
+    createdAt: string; // Data de criação
+    modifiedAt: string; // Data da última modificação
+}
+
+
+function logToFile(message: string) {
+    const logFilePath = join(os.homedir(), 'meu-sistema-logs.txt');
+    const logMessage = `[${new Date().toISOString()}] ${message}\n`;
+
+    fs.appendFile(logFilePath, logMessage, (err) => {
+        if (err) console.error('Erro ao gravar no log:', err);
+    });
+}
+
 
 ipcMain.handle('open-folder', async (_, folderPath) => {
     const command = process.platform === 'win32'
@@ -18,13 +39,6 @@ ipcMain.handle('open-folder', async (_, folderPath) => {
     });
 });
 
-
-interface ZipFile {
-    name: string;
-    size: number; // Tamanho em bytes
-    createdAt: string; // Data de criação
-    modifiedAt: string; // Data da última modificação
-}
 
 ipcMain.handle('get-zip-files', async (_, folderPath: string): Promise<ZipFile[]> => {
     try {
@@ -79,9 +93,10 @@ ipcMain.handle('move-unique-file', async (_, sourceFolderPath: string, destinati
         const destinationPath = join(destinationFolderPath, fileName);
         await rename(sourcePath, destinationPath); // Move o arquivo especificado
 
+        logToFile(`Moved file ${fileName} from ${sourceFolderPath} to ${destinationFolderPath}`);
         return { success: true };
     } catch (error) {
-        console.error('Error moving file:', error);
+        logToFile(`Error moving file ${fileName}: ${error}`);
         return { success: false, error: error };
     }
 });
