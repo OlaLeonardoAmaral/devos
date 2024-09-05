@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import { exec } from 'child_process';
 import { join } from 'path';
-import { readdir, rename, stat } from 'fs/promises';
+import { readdir, copyFile, unlink, stat } from 'fs/promises';
 import dayjs from 'dayjs';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -75,7 +75,10 @@ ipcMain.handle('move-files', async (_, sourceFolderPath: string, destinationFold
         for (const file of zipFiles) {
             const sourcePath = join(sourceFolderPath, file);
             const destinationPath = join(destinationFolderPath, file);
-            await rename(sourcePath, destinationPath);
+            // await rename(sourcePath, destinationPath);
+
+            await copyFile(sourcePath, destinationPath);
+            await unlink(sourcePath); // Simula o "move" deletando o original
         }
 
         return { success: true };
@@ -91,7 +94,10 @@ ipcMain.handle('move-unique-file', async (_, sourceFolderPath: string, destinati
     try {
         const sourcePath = join(sourceFolderPath, fileName);
         const destinationPath = join(destinationFolderPath, fileName);
-        await rename(sourcePath, destinationPath); // Move o arquivo especificado
+        // await rename(sourcePath, destinationPath); // Move o arquivo especificado
+
+        await copyFile(sourcePath, destinationPath); // Copia o arquivo
+        await unlink(sourcePath); // Exclui o arquivo original
 
         logToFile(`Moved file ${fileName} from ${sourceFolderPath} to ${destinationFolderPath}`);
         return { success: true };
