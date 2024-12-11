@@ -1,13 +1,15 @@
 import React, { ReactNode, useState } from 'react';
 import Sidebar from './Sidebar';
 import { ArchiveCard } from '../archive-card';
+import { useArquivos } from '../../contexts/ListArquivoContext';
+import Blank from './Blank';
 
-const MainLayout = ({ children }: { children: ReactNode }) => {
+const MainLayout = () => {
     const [title, setTitle] = useState<string>('Home');
-    const [caminhoPasta, setCaminhoPasta] = useState<string>('C:\\fontes');
+    const { caminhoAtual, arquivos } = useArquivos();
 
 
-    
+
     return (
         <div
             className="grid h-screen bg-rotion-900 text-rotion-50 font-sans"
@@ -16,43 +18,45 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
                 gridTemplateRows: 'auto',
             }}
         >
-            <Sidebar setTitle={setTitle} setCaminhoPasta={setCaminhoPasta} />
+            <Sidebar setTitle={setTitle} />
 
-            {/* Main Content */}
+
             <main className="flex-grow bg-rotion-800 text-rotion-50 p-8 shadow-green-light animate-moveCard">
-                <header className="flex flex-col gap-3 colum text-rotion-100 mb-4">
+                <header className="flex flex-col gap-3 colum text-rotion-50 p-2">
                     <h1 className="text-4xl font-bold">{title}</h1>
                     <a
                         href='#'
                         className="text-rotion-400 text-lg">
-                        {caminhoPasta}
+                        {caminhoAtual}
                     </a>
                 </header>
-
                 <div
                     className={`
                         flex 
                         flex-wrap 
-                        gap-4 
+                        gap-y-5 
+                        gap-x-8
                         overflow-auto 
                         max-h-[calc(100vh-160px)] 
                         relative 
-                        p-2`}
+                        p-4
+                        ${arquivos.length === 0 ? 'flex items-center justify-center min-h-[calc(100vh-160px)]' : ''}
+                        `}
                 >
-
-                    {Array.from({ length: 20 }, (_, index) => (
-                        <ArchiveCard
-                            key={index}
-                            title={`r2sandre_d7_${index + 1}.zip`}
-                            date={`17/12-/2024 - 10h${22 + index}`}
-                            onClick={() => console.log(`Click on card ${index + 1}`)}
-                            isMoving={false}
-                        />
-                    ))}
-
+                    {arquivos.length > 0 ? (
+                        arquivos.map((card) => (
+                            <ArchiveCard
+                                key={card.id}
+                                title={card.title}
+                                date={card.date}
+                                onClick={() => console.log(`Clicked on ${card.title}`)}
+                                isMoving={false}
+                            />
+                        ))
+                    ) : (
+                        <Blank message='' />
+                    )}
                 </div>
-
-                {children}
             </main>
         </div>
     );

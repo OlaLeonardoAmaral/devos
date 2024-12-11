@@ -11,15 +11,15 @@ import './styles/global.css';
 
 //   // const sourceFolderMyFiles = '//Users//leonardoamaral//Documents//devosteste//C//fontes';
 //   // const sourceFolderAFazer  = '//Users//leonardoamaral//Documents//devosteste//U//fontes//a fazer';
-  
-  
+
+
 //   // const folderUpdateMy = '//Users//leonardoamaral//Documents//devosteste//C//fontes//atualizar';
 //   // const folderUpdateHe = '//Users//leonardoamaral//Documents//devosteste//U//fontes//atualizar';
 
 //   const sourceFolderMyFiles = 'C:\\Fontes';
 //   const sourceFolderAFazer  = 'U:\\Fontes\\a fazer';
 
-  
+
 //   const folderUpdateMy = 'C:\\Fontes\\atualizar';
 //   const folderUpdateHe = 'U:\\Fontes\\atualizar';
 
@@ -180,14 +180,13 @@ import './styles/global.css';
 
 import React from 'react';
 import MainLayout from './components/layout/MainLayout';
+import { ArquivoProvider } from './contexts/ListArquivoContext';
 
 const App = () => {
   return (
-    <MainLayout>
-      <div>
-      
-      </div>
-    </MainLayout>
+    <ArquivoProvider>
+      <MainLayout />
+    </ArquivoProvider>
   );
 };
 

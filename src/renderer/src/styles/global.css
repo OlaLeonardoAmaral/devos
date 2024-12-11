@@ -29,9 +29,7 @@
     left: 0;
 }
 
-/* Adicione essa parte ao seu CSS global ou em um arquivo de estilo apropriado */
 
-/* Definindo a animação */
 /* global.css */
 @keyframes moveCard {
     0% {
@@ -45,10 +43,10 @@
   }
   
   .animate-moveCard {
-    animation: moveCard 0.3s ease-in-out;
+    animation: moveCard 0.5s ease-out;
   }
 
-  /* Contorno suave da borda */
+
 .rounded-r-lg {
   border-radius: 0 20px 20px 0; /* Borda arredondada apenas à direita */
 }
@@ -105,4 +103,8 @@
   position: relative;
   z-index: 1;
 }
+
+
+
+
 

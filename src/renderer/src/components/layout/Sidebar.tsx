@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
+import { useArquivos } from '../../contexts/ListArquivoContext';
 
 
 interface SidebarProps {
     setTitle: (title: string) => void
-    setCaminhoPasta: (title: string) => void
 }
 
 
-const Sidebar = ({ setTitle, setCaminhoPasta }: SidebarProps) => {
-    const [activeItem, setActiveItem] = useState<string>('Home'); // Estado do item ativo
-
+const Sidebar = ({ setTitle }: SidebarProps) => {
+    const [activeItem, setActiveItem] = useState<string>('Home');
+    const { mudarCaminho } = useArquivos();
 
     const servidorProg = 'U:\\Fontes'
 
@@ -24,9 +24,8 @@ const Sidebar = ({ setTitle, setCaminhoPasta }: SidebarProps) => {
 
     const handleItemClick = (itemTitle: string, itemCaminhoPasta: string) => {
         setActiveItem(itemTitle);
-
-        setTitle(itemTitle);
-        setCaminhoPasta(itemCaminhoPasta);
+        setTitle(itemTitle);        
+        mudarCaminho(itemCaminhoPasta)
     };
 
     return (
