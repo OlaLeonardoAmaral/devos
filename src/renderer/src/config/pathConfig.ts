@@ -6,8 +6,8 @@ export const paths = {
     aFazer:          `${servidorProg}\\a fazer`,
     atualizar:       `${servidorProg}\\atualizar`,
     emAndamento:     `${servidorProg}\\em andamento`,
-    semModificacoes: `${servidorProg}\\sem modificações`,
-    consulta:        `${servidorProg}\\consulta`,
+    semModificacoes: `${servidorProg}\\sem modificacoes`,
+    consulta:        `${servidorProg}\\somente consulta`,
 } as const;
 
 
