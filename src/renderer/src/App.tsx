@@ -19,16 +19,14 @@ import './styles/global.css';
 //   const sourceFolderMyFiles = 'C:\\Fontes';
 //   const sourceFolderAFazer  = 'U:\\Fontes\\a fazer';
 
-
 //   const folderUpdateMy = 'C:\\Fontes\\atualizar';
 //   const folderUpdateHe = 'U:\\Fontes\\atualizar';
 
 //   const getMyFiles = async () => {
-//     const myFiles = await window.api.getZipFiles(sourceFolderMyFiles);
+//     const myFiles     = await window.api.getZipFiles(sourceFolderMyFiles);
 //     const afazerFiles = await window.api.getZipFiles(sourceFolderAFazer);
-
-
 //     const filesUpdate = await window.api.getZipFiles(folderUpdateMy);
+
 
 //     setUpdateFiles(false)
 //     if (filesUpdate && filesUpdate.length > 0) {

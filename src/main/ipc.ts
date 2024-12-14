@@ -9,9 +9,9 @@ import * as os from 'os';
 
 interface ZipFile {
     name: string;
-    size: number; // Tamanho em bytes
-    createdAt: string; // Data de criação
-    modifiedAt: string; // Data da última modificação
+    size: number;
+    createdAt: string;
+    modifiedAt: string;
 }
 
 
@@ -67,26 +67,29 @@ ipcMain.handle('get-zip-files', async (_, folderPath: string): Promise<ZipFile[]
 });
 
 
-ipcMain.handle('move-files', async (_, sourceFolderPath: string, destinationFolderPath: string) => {
-    try {
-        const files = await readdir(sourceFolderPath);
-        const zipFiles = files.filter(file => file.endsWith('.zip'));
+//*********
+// move-files estava sendo usado para pegar todos os arquivos da pasta atualizar e jogar no U: atualiza
+//*********
+// ipcMain.handle('move-files', async (_, sourceFolderPath: string, destinationFolderPath: string) => {
+//     try {
+//         const files = await readdir(sourceFolderPath);
+//         const zipFiles = files.filter(file => file.endsWith('.zip'));
 
-        for (const file of zipFiles) {
-            const sourcePath = join(sourceFolderPath, file);
-            const destinationPath = join(destinationFolderPath, file);
-            // await rename(sourcePath, destinationPath);
+//         for (const file of zipFiles) {
+//             const sourcePath = join(sourceFolderPath, file);
+//             const destinationPath = join(destinationFolderPath, file);
+//             // await rename(sourcePath, destinationPath);
 
-            await copyFile(sourcePath, destinationPath);
-            await unlink(sourcePath); // Simula o "move" deletando o original
-        }
+//             await copyFile(sourcePath, destinationPath);
+//             await unlink(sourcePath); // Simula o "move" deletando o original
+//         }
 
-        return { success: true };
-    } catch (error) {
-        console.error('Error moving files:', error);
-        return { success: false, error: error };
-    }
-});
+//         return { success: true };
+//     } catch (error) {
+//         console.error('Error moving files:', error);
+//         return { success: false, error: error };
+//     }
+// });
 
 
 // Handler para mover um único arquivo de uma pasta para outra
@@ -94,7 +97,10 @@ ipcMain.handle('move-unique-file', async (_, sourceFolderPath: string, destinati
     try {
         const sourcePath = join(sourceFolderPath, fileName);
         const destinationPath = join(destinationFolderPath, fileName);
-        // await rename(sourcePath, destinationPath); // Move o arquivo especificado
+        
+        // Move o arquivo especificado
+        // await rename(sourcePath, destinationPath); 
+        // Por algum motivo o rename nao estava movendo no windows
 
         await copyFile(sourcePath, destinationPath); // Copia o arquivo
         await unlink(sourcePath); // Exclui o arquivo original

@@ -2,19 +2,19 @@
 interface ArchiveCardProps {
     title: string;
     date: string;
-    key: number;
+    id: number;
     onClick: () => void;
     isMoving: boolean;
 }
 
 
-export function ArchiveCard({ key, title, date, onClick, isMoving }: ArchiveCardProps) {
+export function ArchiveCard({ id, title, date, onClick, isMoving }: ArchiveCardProps) {
 
     return (
         <div
             className={`relative transition-transform transform`}
             onClick={onClick}
-            key={key}
+            key={id}
         >
             <div
                 className={`

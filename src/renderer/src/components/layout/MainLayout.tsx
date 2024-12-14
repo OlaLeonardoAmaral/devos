@@ -10,6 +10,57 @@ const MainLayout = () => {
 
 
 
+
+    //   const { data, refetch } = useQuery(
+    //     {
+    //       queryKey: ['files'],
+    //       queryFn: getMyFiles,
+    //     }
+    //   )
+
+
+    // Função para mover o arquivo ao clicar
+    //   const handleFileMove = async (fileName: string, currentFolder: string, targetFolder: string) => {
+    //     setIsMoving(prevState => ({ ...prevState, [fileName]: true })); // Ativa a animação para o card específico
+
+
+    //     try {
+    //       const result = await window.api.moveUniqueFiles(
+    //         currentFolder,
+    //         targetFolder,
+    //         fileName
+    //       );
+
+    //       if (result.success) {
+    //         console.log('Arquivo movido com sucesso!');
+    //         refetch(); // Atualiza a lista de arquivos após mover
+    //       } else {
+    //         console.error('Erro ao mover arquivo:', result.error);
+    //       }
+    //     } catch (error) {
+    //       console.error('Erro ao mover arquivo:', error);
+    //     } 
+
+
+
+    //     finally {
+    //       setTimeout(() => {
+    //         setIsMoving(prevState => ({ ...prevState, [fileName]: false })); // Reseta a animação após a transição
+    //       }, 300);
+    //     }
+    //   };                                
+
+
+
+
+    // De: Meus Fontes ;;; Para: A Fazer
+    // onClick={() => handleFileMove(archive.name, sourceFolderMyFiles, sourceFolderAFazer)}
+
+    // De: A Fazer ;;; Para: Meus Fontes
+    // onClick={() => handleFileMove(archive.name, sourceFolderAFazer, sourceFolderMyFiles)} 
+
+
+
     return (
         <div
             className="grid h-screen bg-rotion-900 text-rotion-50 font-sans"
@@ -46,10 +97,19 @@ const MainLayout = () => {
                     {arquivos.length > 0 ? (
                         arquivos.map((card) => (
                             <ArchiveCard
-                                key={card.id}
-                                title={card.title}
-                                date={card.date}
-                                onClick={() => console.log(`Clicked on ${card.title}`)}
+                                id={0}
+                                title={card.name}
+                                date={card.modifiedAt}
+
+                                // De: Meus Fontes ;;; Para: A Fazer
+                                // onClick={() => handleFileMove(archive.name, sourceFolderMyFiles, sourceFolderAFazer)}
+
+                                // De: A Fazer ;;; Para: Meus Fontes
+                                // onClick={() => handleFileMove(archive.name, sourceFolderAFazer, sourceFolderMyFiles)} 
+                                onClick={() => console.log(`Clicked on ${card.name}`)}
+
+
+
                                 isMoving={false}
                             />
                         ))
