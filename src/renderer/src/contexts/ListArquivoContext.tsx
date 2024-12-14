@@ -7,6 +7,7 @@ type ArquivoContextType = {
     caminhoAtual: string;
     arquivos: ZipFile[];
     mudarCaminho: (novoCaminho: string) => void;
+    atualizarArquivos: () => void;
 };
 
 const ListArquivoContext = createContext<ArquivoContextType | undefined>(undefined);
@@ -20,21 +21,19 @@ export const ArquivoProvider = ({ children }: { children: React.ReactNode }) => 
         setCaminhoAtual(novoCaminho);
     };
 
-    useEffect(() => {
-        const atualizarArquivos = async () => {
-            const arquivos = await window.api.getZipFiles(caminhoAtual);
-            setArquivosEmPasta(arquivos);
-        };
+    const atualizarArquivos = async () => {
+        const arquivos = await window.api.getZipFiles(caminhoAtual);
+        setArquivosEmPasta(arquivos);
+    };
 
+    useEffect(() => {
         atualizarArquivos();
     }, [caminhoAtual]);
-
-
 
     const arquivos = arquivosEmPasta;
 
     return (
-        <ListArquivoContext.Provider value={{ caminhoAtual, arquivos, mudarCaminho }}>
+        <ListArquivoContext.Provider value={{ caminhoAtual, arquivos, mudarCaminho, atualizarArquivos }}>
             {children}
         </ListArquivoContext.Provider>
     );

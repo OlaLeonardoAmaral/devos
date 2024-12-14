@@ -1,8 +1,9 @@
+import { useState } from "react";
 
 interface ArchiveCardProps {
     title: string;
     date: string;
-    id: number;
+    id: string;
     onClick: () => void;
     isMoving: boolean;
 }
@@ -10,11 +11,12 @@ interface ArchiveCardProps {
 
 export function ArchiveCard({ id, title, date, onClick, isMoving }: ArchiveCardProps) {
 
+
     return (
         <div
             className={`relative transition-transform transform`}
-            onClick={onClick}
             key={id}
+            onClick={onClick}
         >
             <div
                 className={`
@@ -32,13 +34,19 @@ export function ArchiveCard({ id, title, date, onClick, isMoving }: ArchiveCardP
                     cursor-pointer 
                     transition-transform 
                     transform 
-                    relative ${isMoving ? 'animate-moveCard' : ''} 
+                    relative 
                     hover:scale-105 
                     hover:shadow-lg 
                     hover:z-10`}
-                onClick={onClick}
             >
-                <h3 className="text-rotion-50 text-lg">{title}</h3>
+                <div className="flex justify-between items-center">
+                    <h3 className="text-rotion-50 text-lg truncate flex-grow mr-2">{title}</h3>
+                    {isMoving && (
+                        <div className="animate-pulse text-green-500 text-sm">
+                            Movendo...
+                        </div>
+                    )}
+                </div>
                 <p className="text-rotion-400 text-sm">{date}</p>
             </div>
         </div>

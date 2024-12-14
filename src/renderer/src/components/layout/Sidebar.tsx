@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useArquivos } from '../../contexts/ListArquivoContext';
 import { menu } from '../../config/pathResolver';
+import { CheckFat } from '@phosphor-icons/react';
 
 
 interface SidebarProps {
     setTitle: (title: string) => void
+    feedback: { [key: string]: boolean }
 }
 
 
-const Sidebar = ({ setTitle }: SidebarProps) => {
+const Sidebar = ({ setTitle, feedback }: SidebarProps) => {
     const [activeItem, setActiveItem] = useState<string>('Home');
     const { mudarCaminho } = useArquivos();
 
@@ -34,6 +36,7 @@ const Sidebar = ({ setTitle }: SidebarProps) => {
                         label={item.title}
                         isActive={activeItem === item.title}
                         onClick={() => handleItemClick(item.title, item.caminhoPasta)}
+                        showFeedback={feedback[item.caminhoPasta]}
                     />
                 ))}
             </nav>
@@ -43,20 +46,38 @@ const Sidebar = ({ setTitle }: SidebarProps) => {
 
 export default Sidebar;
 
+
+interface MenuProps {
+    label: string;
+    isActive?: boolean;
+    onClick?: () => void;
+    showFeedback?: boolean;
+}
+
 const MenuItem = ({
     label,
     isActive,
     onClick,
-}: {
-    label: string;
-    isActive?: boolean;
-    onClick?: () => void;
-}) => (
+    showFeedback,
+}: MenuProps) => (
     <div
         onClick={onClick}
-        className={`sidebar-item p-3 rounded-md cursor-pointer transition-all ${isActive ? 'is-active bg-rotion-700 text-white' : 'hover:bg-rotion-700 hover:text-rotion-50'
-            }`}
+        className={`sidebar-item 
+                        p-3 
+                        rounded-md 
+                        cursor-pointer 
+                        transition-all 
+                        ${isActive ? 'is-active bg-rotion-700 text-white' : 'hover:bg-rotion-700 hover:text-rotion-50'}`
+        }
     >
-        <span>{label}</span>
+        <span className="flex items-center gap-6">
+            <p>{label}</p> 
+
+            {showFeedback && (
+                <span className="animate-ping">
+                    <CheckFat size={16} color="#00f900" weight="fill" />
+                </span> 
+            )}
+        </span>
     </div>
 );

@@ -5,9 +5,11 @@ import { readdir, copyFile, unlink, stat } from 'fs/promises';
 import dayjs from 'dayjs';
 import * as fs from 'fs';
 import * as os from 'os';
+import { v4 as uuidv4 } from 'uuid';
 
 
 interface ZipFile {
+    id: string;
     name: string;
     size: number;
     createdAt: string;
@@ -51,6 +53,7 @@ ipcMain.handle('get-zip-files', async (_, folderPath: string): Promise<ZipFile[]
                 const fileStats = await stat(filePath);
 
                 zipFiles.push({
+                    id: uuidv4(),
                     name: file,
                     size: fileStats.size,
                     createdAt: dayjs(fileStats.birthtime).format('DD/MM/YYYY - HH:mm'),
@@ -67,43 +70,14 @@ ipcMain.handle('get-zip-files', async (_, folderPath: string): Promise<ZipFile[]
 });
 
 
-//*********
-// move-files estava sendo usado para pegar todos os arquivos da pasta atualizar e jogar no U: atualiza
-//*********
-// ipcMain.handle('move-files', async (_, sourceFolderPath: string, destinationFolderPath: string) => {
-//     try {
-//         const files = await readdir(sourceFolderPath);
-//         const zipFiles = files.filter(file => file.endsWith('.zip'));
 
-//         for (const file of zipFiles) {
-//             const sourcePath = join(sourceFolderPath, file);
-//             const destinationPath = join(destinationFolderPath, file);
-//             // await rename(sourcePath, destinationPath);
-
-//             await copyFile(sourcePath, destinationPath);
-//             await unlink(sourcePath); // Simula o "move" deletando o original
-//         }
-
-//         return { success: true };
-//     } catch (error) {
-//         console.error('Error moving files:', error);
-//         return { success: false, error: error };
-//     }
-// });
-
-
-// Handler para mover um único arquivo de uma pasta para outra
 ipcMain.handle('move-unique-file', async (_, sourceFolderPath: string, destinationFolderPath: string, fileName: string) => {
     try {
         const sourcePath = join(sourceFolderPath, fileName);
         const destinationPath = join(destinationFolderPath, fileName);
-        
-        // Move o arquivo especificado
-        // await rename(sourcePath, destinationPath); 
-        // Por algum motivo o rename nao estava movendo no windows
 
-        await copyFile(sourcePath, destinationPath); // Copia o arquivo
-        await unlink(sourcePath); // Exclui o arquivo original
+        await copyFile(sourcePath, destinationPath);
+        await unlink(sourcePath);
 
         logToFile(`Moved file ${fileName} from ${sourceFolderPath} to ${destinationFolderPath}`);
         return { success: true };
