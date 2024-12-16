@@ -59,10 +59,18 @@ ipcMain.handle('get-zip-files', async (_, folderPath: string): Promise<ZipFile[]
                     createdAt: dayjs(fileStats.birthtime).format('DD/MM/YYYY - HH:mm'),
                     modifiedAt: dayjs(fileStats.ctime).format('DD/MM/YYYY - HH:mm'),
                 });
+
             }
         }
 
-        return zipFiles;
+
+        zipFiles.sort((a, b) => {
+            const dateA = dayjs(a.modifiedAt, 'DD/MM/YYYY - HH:mm').toDate();
+            const dateB = dayjs(b.modifiedAt, 'DD/MM/YYYY - HH:mm').toDate();
+            return dateB.getTime() - dateA.getTime(); // Mais recente primeiro
+        });
+
+        return zipFiles; // eu quero que seja retornado em ordem de modifiedAt (do mais atualizado para o mais antigo)
     } catch (error) {
         console.error('Error reading directory:', error);
         return [];

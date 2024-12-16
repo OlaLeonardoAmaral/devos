@@ -145,3 +145,25 @@
 .animate-ping {
   ping: bounce-left 5s both;
 }
+
+
+
+
+
+div::-webkit-scrollbar {
+  width: 6px; /* Largura do scroll */
+  height: 8px; /* Altura do scroll horizontal */
+}
+
+div::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5); /* Cor da barra de rolagem */
+  border-radius: 4px; /* Arredondamento para suavizar */
+}
+
+div::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.7); /* Cor ao passar o mouse */
+}
+
+div::-webkit-scrollbar-track {
+  background: transparent; /* Fundo invisível */
+}
