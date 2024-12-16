@@ -2,7 +2,7 @@
 import { menuItemsTest, pathsTest } from './pathConfigTest';
 import { menuItems, paths } from './pathConfig'; 
 
-const isTestEnvironment = (): boolean => true;
+const isTestEnvironment = (): boolean => false;
 
 export const menu = isTestEnvironment() ? menuItemsTest : menuItems;
 export const pastas = isTestEnvironment() ? pathsTest : paths;
