@@ -5,6 +5,7 @@ import { useArquivos } from '../../contexts/ListArquivoContext';
 import Blank from './Blank';
 import { ArrowsCounterClockwise } from '@phosphor-icons/react';
 import { pastas } from '../../config/pathResolver';
+import { sep } from 'node:path';
 
 const MainLayout = () => {
     const [title, setTitle] = useState<string>('Home');
@@ -72,7 +73,8 @@ const MainLayout = () => {
             const fileExtension = file.name.split('.').pop()?.toLowerCase();
 
             if (fileExtension === 'zip') {
-                const directoryPath = file.path.substring(0, file.path.lastIndexOf('/'));
+                const directoryPath = file.path.substring(0, file.path.lastIndexOf(sep));
+
            
                 const result = await window.api.moveUniqueFiles(
                     directoryPath,
