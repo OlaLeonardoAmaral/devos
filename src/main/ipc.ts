@@ -70,7 +70,7 @@ ipcMain.handle('get-zip-files', async (_, folderPath: string): Promise<ZipFile[]
             return dateB.getTime() - dateA.getTime(); // Mais recente primeiro
         });
 
-        return zipFiles; // eu quero que seja retornado em ordem de modifiedAt (do mais atualizado para o mais antigo)
+        return zipFiles;
     } catch (error) {
         console.error('Error reading directory:', error);
         return [];

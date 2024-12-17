@@ -3,10 +3,12 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 // import icon from '../../resources/icon.png?asset'
 import './ipc'
+import path from 'node:path'
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
+    title: "Devos",
     width: 1190,
     height: 710,
     show: false,
@@ -35,6 +37,11 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+}
+
+if(process.platform === 'darwin') {
+  // app.dock.setIcon(path.resolve(__dirname, '../resources/icon.png'))
+  app.dock.setIcon(path.join(__dirname, '../../build/icon.png'))
 }
 
 // This method will be called when Electron has finished
