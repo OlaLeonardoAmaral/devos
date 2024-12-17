@@ -66,12 +66,12 @@ const MainLayout = () => {
         event.preventDefault();
         setIsDragging(false);
 
-
         const files = event.dataTransfer.files;
 
         for (const file of files) {
             if (file.type === 'application/zip') {
                 const directoryPath = file.path.substring(0, file.path.lastIndexOf('/'));
+           
                 const result = await window.api.moveUniqueFiles(
                     directoryPath,
                     pastas.atualizar,
@@ -88,10 +88,10 @@ const MainLayout = () => {
 
 
                 } else {
-                    console.error('Erro ao mover o arquivo:', result.error);
+                    window.alert('Erro ao mover o arquivo: ' + result.error);
                 }
             } else {
-                console.warn('Apenas arquivos .zip são suportados.');
+                window.alert('Apenas arquivos .zip são suportados.');
             }
         }
     };
