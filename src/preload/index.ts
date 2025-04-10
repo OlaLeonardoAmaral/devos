@@ -30,8 +30,12 @@ const api = {
   // quando o usuario clicar no card do arquivo, o arquivo vai ser movido de um lugar para o outro
   moveUniqueFiles(sourceFolderPath: string, destinationFolderPath: string, fileName: string): Promise<{ success: boolean, error?: string }> {
     return ipcRenderer.invoke('move-unique-file', sourceFolderPath, destinationFolderPath, fileName);
-  }
+  },
 
+  // vai ler o arquivo de log
+  readLogs(): Promise<string> {
+    return ipcRenderer.invoke('read-logs');
+  },
 }
 
 if (process.contextIsolated) {

@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import { exec } from 'child_process';
 import { join } from 'path';
-import { readdir, copyFile, unlink, stat } from 'fs/promises';
+import { readdir, copyFile, unlink, stat, readFile, writeFile } from 'fs/promises';
 import dayjs from 'dayjs';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -16,6 +16,43 @@ interface ZipFile {
     modifiedAt: string;
 }
 
+
+async function logToJson(type: 'moved' | 'error', fileName: string, fromPath?: string, toPath?: string, errorMessage?: string) {
+    const logFilePath = join(os.homedir(), 'meu-sistema-logs.json');
+    const logEntry = {
+        timestamp: new Date().toISOString(),
+        type,
+        file: fileName,
+        ...(fromPath && { from_path: fromPath }),
+        ...(toPath && { to_path: toPath }),
+        ...(errorMessage && { error_message: errorMessage }),
+    };
+
+    try {
+        // Tenta ler o arquivo existente
+        let existingLogs: any[] = [];
+        try {
+            const fileContent = await readFile(logFilePath, 'utf-8');
+            existingLogs = JSON.parse(fileContent);
+        } catch (err) {
+            // Se o arquivo não existir ou estiver vazio, começa com array vazio
+            existingLogs = [];
+        }
+
+        // Adiciona o novo log
+        existingLogs.push(logEntry);
+
+        // Ordena do mais recente para o mais antigo
+        existingLogs.sort((a, b) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+
+        // Escreve de volta no arquivo
+        await writeFile(logFilePath, JSON.stringify(existingLogs, null, 2), 'utf-8');
+    } catch (err) {
+        console.error('Erro ao gravar log em JSON:', err);
+    }
+}
 
 function logToFile(message: string) {
     const logFilePath = join(os.homedir(), 'meu-sistema-logs.txt');
@@ -87,10 +124,27 @@ ipcMain.handle('move-unique-file', async (_, sourceFolderPath: string, destinati
         await copyFile(sourcePath, destinationPath);
         await unlink(sourcePath);
 
-        logToFile(`Moved file ${fileName} from ${sourceFolderPath} to ${destinationFolderPath}`);
+        await logToJson('moved', fileName, sourceFolderPath, destinationFolderPath);
         return { success: true };
     } catch (error) {
-        logToFile(`Error moving file ${fileName}: ${error}`);
+        await logToJson('error', fileName, undefined, undefined, String(error));
         return { success: false, error: error };
     }
 });
+
+
+
+ipcMain.handle("read-logs", async () => {
+    try {
+        const logFilePath = join(os.homedir(), 'meu-sistema-logs.json');
+        const fileContent = await readFile(logFilePath, 'utf-8');
+        return JSON.parse(fileContent); // Retorna o conteúdo do JSON como objeto
+    } catch (error) {
+        console.error('Erro ao ler logs:', error);
+        return []; // Retorna array vazio em caso de erro
+    }
+
+});
+
+
+

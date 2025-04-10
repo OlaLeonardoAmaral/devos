@@ -58,9 +58,9 @@
 }
 
 .sidebar-item.is-active::after {
-  width: 200%; 
+  /* width: 200%; 
   height: 200%;
-  transition: width 0.3s ease, height 0.3s ease;
+  transition: ease;  */
 }
 
 
