@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { exec } from 'child_process';
-import { join } from 'path';
+import * as path from 'path'; // Import path module
 import { readdir, copyFile, unlink, stat, readFile, writeFile } from 'fs/promises';
 import dayjs from 'dayjs';
 import * as fs from 'fs';
@@ -17,8 +17,8 @@ interface ZipFile {
 }
 
 
-async function logToJson(type: 'moved' | 'error', fileName: string, fromPath?: string, toPath?: string, errorMessage?: string) {
-    const logFilePath = join(os.homedir(), 'meu-sistema-logs.json');
+async function logToJson(type: 'moved' | 'error' | 'extracted', fileName: string, fromPath?: string, toPath?: string, errorMessage?: string) {
+    const logFilePath = path.join(os.homedir(), 'meu-sistema-logs.json');
     const logEntry = {
         timestamp: new Date().toISOString(),
         type,
@@ -55,7 +55,7 @@ async function logToJson(type: 'moved' | 'error', fileName: string, fromPath?: s
 }
 
 function logToFile(message: string) {
-    const logFilePath = join(os.homedir(), 'meu-sistema-logs.txt');
+    const logFilePath = path.join(os.homedir(), 'meu-sistema-logs.txt');
     const logMessage = `[${new Date().toISOString()}] ${message}\n`;
 
     fs.appendFile(logFilePath, logMessage, (err) => {
@@ -86,7 +86,7 @@ ipcMain.handle('get-zip-files', async (_, folderPath: string): Promise<ZipFile[]
 
         for (const file of files) {
             if (file.endsWith('.zip')) {
-                const filePath = join(folderPath, file);
+                const filePath = path.join(folderPath, file);
                 const fileStats = await stat(filePath);
 
                 zipFiles.push({
@@ -118,8 +118,8 @@ ipcMain.handle('get-zip-files', async (_, folderPath: string): Promise<ZipFile[]
 
 ipcMain.handle('move-unique-file', async (_, sourceFolderPath: string, destinationFolderPath: string, fileName: string) => {
     try {
-        const sourcePath = join(sourceFolderPath, fileName);
-        const destinationPath = join(destinationFolderPath, fileName);
+        const sourcePath = path.join(sourceFolderPath, fileName);
+        const destinationPath = path.join(destinationFolderPath, fileName);
 
         await copyFile(sourcePath, destinationPath);
         await unlink(sourcePath);
@@ -136,7 +136,7 @@ ipcMain.handle('move-unique-file', async (_, sourceFolderPath: string, destinati
 
 ipcMain.handle("read-logs", async () => {
     try {
-        const logFilePath = join(os.homedir(), 'meu-sistema-logs.json');
+        const logFilePath = path.join(os.homedir(), 'meu-sistema-logs.json');
         const fileContent = await readFile(logFilePath, 'utf-8');
         return JSON.parse(fileContent); // Retorna o conteúdo do JSON como objeto
     } catch (error) {
@@ -146,5 +146,36 @@ ipcMain.handle("read-logs", async () => {
 
 });
 
+ipcMain.handle('extract-zip-file', async (_, zipFilePath: string, outputDirectoryName: string, password?: string) => {
+    const sourceFolderPath = path.dirname(zipFilePath);
+    const fileName = path.basename(zipFilePath);
+    const destinationPath = path.join(sourceFolderPath, outputDirectoryName);
 
+    try {
+        await fs.promises.mkdir(destinationPath, { recursive: true });
 
+        // This command assumes 7-Zip (7z) is installed and in the system's PATH.
+        // Adjust the command if you use a different utility or path.
+        const command = `7z x "${zipFilePath}" -o"${destinationPath}" ${password ? `-p"${password}"` : ''} -y`;
+
+        return new Promise((resolve) => {
+            exec(command, async (errorEx, stdout, stderr) => {
+                if (errorEx) {
+                    console.error(`Extraction error for ${fileName}: ${errorEx.message}`);
+                    await logToJson('error', fileName, zipFilePath, destinationPath, errorEx.message);
+                    resolve({ success: false, error: `Extraction failed: ${errorEx.message}` });
+                    return;
+                }
+                if (stderr) {
+                    console.warn(`Extraction stderr for ${fileName}: ${stderr}`);
+                }
+                await logToJson('extracted', fileName, zipFilePath, destinationPath);
+                resolve({ success: true, message: `File ${fileName} extracted to ${destinationPath}` });
+            });
+        });
+    } catch (error: any) {
+        console.error(`Error setting up extraction for ${fileName}: ${error.message}`);
+        await logToJson('error', fileName, zipFilePath, destinationPath, error.message);
+        return { success: false, error: error.message };
+    }
+});

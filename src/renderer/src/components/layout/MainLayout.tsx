@@ -5,7 +5,10 @@ import { useArquivos } from "../../contexts/ListArquivoContext";
 import Blank from "./Blank";
 import { ArrowsCounterClockwise } from "@phosphor-icons/react";
 import { pastas } from "../../config/pathResolver";
+import { ZipFile } from "../../types"; // Assuming ZipFile type is moved or available here
 import LogsPage from "./LogsPage";
+import StandardizationScreen, { StandardizationData } from "../standardization/StandardizationScreen";
+import path from 'path'; // Import path for joining paths
 
 const MainLayout = () => {
   const [title, setTitle] = useState<string>("Home");
@@ -14,6 +17,12 @@ const MainLayout = () => {
   const [isMoving, setIsMoving] = useState<{ [key: string]: boolean }>({});
   const [feedback, setFeedback] = useState<{ [key: string]: boolean }>({});
   const [isDragging, setIsDragging] = useState(false);
+  
+  // State for Standardization Screen
+  const [showStandardizationScreen, setShowStandardizationScreen] = useState(false);
+  const [fileToStandardize, setFileToStandardize] = useState<ZipFile | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
 
   const handleUpdate = () => {
     setIsUpdating(true);
@@ -22,6 +31,13 @@ const MainLayout = () => {
     setTimeout(() => {
       setIsUpdating(false);
     }, 1000);
+  };
+
+  const displayToast = (message: string) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
   };
 
   const handleOpenFolder = (folderPath: string) => {
@@ -54,6 +70,43 @@ const MainLayout = () => {
     } else {
       result.error;
     }
+  };
+
+  const handleExtractFile = async (file: ZipFile) => {
+    if (!caminhoAtual) {
+      displayToast("Erro: Caminho da pasta atual não definido.");
+      return;
+    }
+    const fullZipPath = path.join(caminhoAtual, file.name);
+    // Extract to a folder named like the zip file (without .zip) + "_extracted"
+    const outputDirName = file.name.replace(/\.zip$/, "") + "_extracted";
+    
+    displayToast(`Extraindo ${file.name}...`);
+    try {
+      const result = await window.api.extractZipFile(fullZipPath, outputDirName, "sil2001");
+      if (result.success) {
+        displayToast(result.message || `Arquivo ${file.name} extraído com sucesso! ✅`);
+        // Optionally, refresh files or notify user
+      } else {
+        displayToast(`Erro ao extrair ${file.name}: ${result.error} ❌`);
+      }
+    } catch (error) {
+      displayToast(`Erro inesperado ao extrair ${file.name}. ❌`);
+      console.error("Extraction API call error:", error);
+    }
+  };
+
+  const handleShowStandardization = (file: ZipFile) => {
+    setFileToStandardize(file);
+    setShowStandardizationScreen(true);
+  };
+
+  const handleStandardizationSubmit = (file: ZipFile, data: StandardizationData) => {
+    console.log("Padronizar arquivo:", file.name);
+    console.log("Dados da padronização:", data);
+    setShowStandardizationScreen(false);
+    setFileToStandardize(null);
+    displayToast(`Projeto ${file.name} padronizado! ✅`);
   };
 
   const handleDragOver = (event: React.DragEvent) => {
@@ -104,6 +157,17 @@ const MainLayout = () => {
     }
   };
 
+  if (showStandardizationScreen && fileToStandardize) {
+    return (
+      <StandardizationScreen
+        file={fileToStandardize}
+        onBack={() => { setShowStandardizationScreen(false); setFileToStandardize(null); }}
+        onSubmit={handleStandardizationSubmit}
+      />
+    );
+  }
+
+
   return (
     <div
       className="grid h-screen bg-rotion-900 text-rotion-50 font-sans"
@@ -113,6 +177,12 @@ const MainLayout = () => {
       }}
     >
       <Sidebar setTitle={setTitle} feedback={feedback} />
+      {toastMessage && (
+        <div className="fixed bottom-5 right-5 bg-gray-700 text-white p-4 rounded-lg shadow-lg z-[100] animate-fadeInOut">
+          {toastMessage}
+        </div>
+      )}
+
 
       {title === "Logs" ? (
         <LogsPage />
@@ -171,17 +241,25 @@ const MainLayout = () => {
             {arquivos.length > 0 ? (
               arquivos.map((file) => (
                 <ArchiveCard
-                  id={file.id}
-                  title={file.name}
-                  date={file.modifiedAt}
+                  key={file.id}
+                  file={file}
                   onClick={() =>
                     handleMoveFile(file.name, caminhoAtual, caminhoAtual)
                   }
                   isMoving={isMoving[file.name] || false}
+                  showActionsMenu={title === "Home"} // Only show menu in "Home"
+                  onExtractRequest={handleExtractFile}
+                  onStandardizeRequest={handleShowStandardization}
                 />
               ))
             ) : (
-              <Blank message="" />
+              <Blank 
+                message={
+                  title === "Atualizar" 
+                    ? "Arraste arquivos .zip para cá ou atualize a pasta." 
+                    : "Nenhum arquivo encontrado."
+                } 
+              />
             )}
           </div>
         </main>
@@ -189,5 +267,4 @@ const MainLayout = () => {
     </div>
   );
 };
-
 export default MainLayout;

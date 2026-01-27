@@ -167,3 +167,31 @@ div::-webkit-scrollbar-thumb:hover {
 div::-webkit-scrollbar-track {
   background: transparent; /* Fundo invisível */
 }
+
+
+
+/* /Users/leonardoamaral/Documents/projetos/devos/src/renderer/src/styles/global.css */
+/* ... existing styles ... */
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; transform: translateY(20px); }
+  10%, 90% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeInOut {
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+
+/* Ensure icon-spin is defined if used, e.g. for loading states */
+.icon-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

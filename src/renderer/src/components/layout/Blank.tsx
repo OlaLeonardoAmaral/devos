@@ -25,7 +25,7 @@ const Blank = ({ message }: { message: string }) => {
                         transform hover:scale-105"
                 >
                     {message}
-                </h2>
+                </h2> 
                 <p
                     className="
             text-rotion-400 

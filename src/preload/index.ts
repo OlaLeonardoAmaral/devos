@@ -36,6 +36,11 @@ const api = {
   readLogs(): Promise<string> {
     return ipcRenderer.invoke('read-logs');
   },
+
+  // Extrai um arquivo zip (potencialmente com senha)
+  extractZipFile(zipFilePath: string, outputDirectoryName: string, password?: string): Promise<{ success: boolean, message?: string, error?: string }> {
+    return ipcRenderer.invoke('extract-zip-file', zipFilePath, outputDirectoryName, password);
+  }
 }
 
 if (process.contextIsolated) {
